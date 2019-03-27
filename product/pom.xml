@@ -29,67 +29,6 @@
         <curator-recipes.version>2.12.0</curator-recipes.version>
     </properties>
 
-    <!--<dependencies>-->
-        <!--<dependency>-->
-            <!--<groupId>org.springframework.boot</groupId>-->
-            <!--<artifactId>spring-data-jpa</artifactId>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>org.springframework.boot</groupId>-->
-            <!--<artifactId>spring-boot-starter-web</artifactId>-->
-        <!--</dependency>-->
-        <!--&lt;!&ndash;<dependency>&ndash;&gt;-->
-        <!--&lt;!&ndash;<groupId>org.mybatis.spring.boot</groupId>&ndash;&gt;-->
-        <!--&lt;!&ndash;<artifactId>mybatis-spring-boot-starter</artifactId>&ndash;&gt;-->
-        <!--&lt;!&ndash;<version>2.0.0</version>&ndash;&gt;-->
-        <!--&lt;!&ndash;</dependency>&ndash;&gt;-->
-        <!--<dependency>-->
-            <!--<groupId>org.springframework.cloud</groupId>-->
-            <!--<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>org.springframework.cloud</groupId>-->
-            <!--<artifactId>spring-cloud-starter-openfeign</artifactId>-->
-        <!--</dependency>-->
-
-        <!--<dependency>-->
-            <!--<groupId>mysql</groupId>-->
-            <!--<artifactId>mysql-connector-java</artifactId>-->
-            <!--<version>6.0.5</version>-->
-            <!--<scope>runtime</scope>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>org.projectlombok</groupId>-->
-            <!--<artifactId>lombok</artifactId>-->
-            <!--<optional>true</optional>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>org.springframework.boot</groupId>-->
-            <!--<artifactId>spring-boot-starter-test</artifactId>-->
-            <!--<scope>test</scope>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>com.ifrabbit</groupId>-->
-            <!--<artifactId>spring-data-mybatis</artifactId>-->
-            <!--<version>1.0.17.RELEASE</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>com.alibaba</groupId>-->
-            <!--<artifactId>fastjson</artifactId>-->
-            <!--<version>1.2.44</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>com.alibaba</groupId>-->
-            <!--<artifactId>druid-spring-boot-starter</artifactId>-->
-            <!--<version>1.1.2</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>org.springframework.boot</groupId>-->
-            <!--<artifactId>spring-boot-starter-jdbc</artifactId>-->
-            <!--<version>1.5.9.RELEASE</version>-->
-        <!--</dependency>-->
-    <!--</dependencies>-->
-
     <dependencies>
 
         <dependency>
@@ -112,44 +51,6 @@
         <!--<dependency>-->
             <!--<groupId>org.springframework.boot</groupId>-->
             <!--<artifactId>spring-boot-starter-data-mongodb</artifactId>-->
-        <!--</dependency>-->
-
-        <!-- swagger -->
-        <!--<dependency>-->
-            <!--<groupId>io.springfox</groupId>-->
-            <!--<artifactId>springfox-core</artifactId>-->
-            <!--<version>2.5.0</version>-->
-        <!--</dependency>-->
-
-        <!--<dependency>-->
-            <!--<groupId>io.springfox</groupId>-->
-            <!--<artifactId>springfox-spi</artifactId>-->
-            <!--<version>2.5.0</version>-->
-        <!--</dependency>-->
-
-        <!--<dependency>-->
-            <!--<groupId>io.springfox</groupId>-->
-            <!--<artifactId>springfox-spring-web</artifactId>-->
-            <!--<version>2.5.0</version>-->
-        <!--</dependency>-->
-
-        <!--<dependency>-->
-            <!--<groupId>io.springfox</groupId>-->
-            <!--<artifactId>springfox-swagger2</artifactId>-->
-            <!--<version>2.5.0</version>-->
-        <!--</dependency>-->
-
-        <!--<dependency>-->
-            <!--<groupId>io.springfox</groupId>-->
-            <!--<artifactId>springfox-swagger-ui</artifactId>-->
-            <!--<version>2.5.0</version>-->
-        <!--</dependency>-->
-
-        <!-- common -->
-        <!--<dependency>-->
-            <!--<groupId>com.sgcc</groupId>-->
-            <!--<artifactId>sgcc-multitenant-common</artifactId>-->
-            <!--<version>1.0</version>-->
         <!--</dependency>-->
 
         <!-- eureka -->
@@ -184,6 +85,7 @@
             <artifactId>druid-spring-boot-starter</artifactId>
             <version>1.1.2</version>
         </dependency>
+
         <dependency>
             <groupId>com.ifrabbit</groupId>
             <artifactId>spring-data-mybatis</artifactId>
