@@ -45,8 +45,8 @@ public class MongoDBServiceImpl implements MongoDBService {
 //        criteria
         MatchOperation match = Aggregation.match(criteria);
         // 修改结果集时间字段 方法1
-        ProjectionOperation timeProject = Aggregation.project(payment)
-                .and(StringOperators.Substr.valueOf(createTime).substring(0, Integer.valueOf(dashboardSet.getTimeDivision()))).as(time);
+//        ProjectionOperation timeProject = Aggregation.project(payment)
+//                .and(StringOperators.Substr.valueOf(createTime).substring(0, Integer.valueOf(dashboardSet.getTimeDivision()))).as(time);
         // 修改结果集时间字段 方法2
         ProjectionOperation timeProject2 = Aggregation.project(payment)
                 .and(DateOperators.DateToString.dateOf(createTime).toString(dashboardSet.getTimeDivision())).as(time);
@@ -58,9 +58,10 @@ public class MongoDBServiceImpl implements MongoDBService {
         ProjectionOperation project = Aggregation.project("total", "used")
                 .and("_id").as(time).andExclude("_id");
         // 按时间排序
-        SortOperation sortOperation = Aggregation.sort(Sort.Direction.ASC, "time");
+        SortOperation sortOperation = Aggregation.sort(Sort.Direction.ASC, time);
         // 组装管道
         Aggregation aggregation = Aggregation.newAggregation(match, timeProject2, group, project, sortOperation);
+        System.out.println(aggregation.toString());
         AggregationResults<DashboardBo> results = mongoTemplate.aggregate(aggregation, "order", DashboardBo.class);
         return validatorResponse(dashboardSet, results.getMappedResults());
     }

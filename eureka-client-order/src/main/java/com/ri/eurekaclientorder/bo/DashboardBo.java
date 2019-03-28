@@ -1,5 +1,7 @@
 package com.ri.eurekaclientorder.bo;
 
+import java.math.BigDecimal;
+
 public class DashboardBo {
     private String availableZone;
 
@@ -9,7 +11,7 @@ public class DashboardBo {
 
     private Integer serviceType;
 
-    private Integer total;
+    private BigDecimal total;
 
     private Integer used;
 
@@ -51,11 +53,11 @@ public class DashboardBo {
         return this;
     }
 
-    public Integer getTotal() {
+    public BigDecimal getTotal() {
         return total;
     }
 
-    public DashboardBo setTotal(Integer total) {
+    public DashboardBo setTotal(BigDecimal total) {
         this.total = total;
         return this;
     }

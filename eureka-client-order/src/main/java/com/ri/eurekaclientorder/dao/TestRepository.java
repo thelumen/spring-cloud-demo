@@ -1,6 +1,6 @@
 package com.ri.eurekaclientorder.dao;
 
-import com.ri.eurekaclientuser.pojo.Order;
+import com.ri.eurekaclientorder.pojo.Order;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
