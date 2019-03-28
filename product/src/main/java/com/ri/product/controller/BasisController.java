@@ -19,9 +19,13 @@ public class BasisController {
         return " .Come from user basis controller" + name;
     }
 
+    /**
+     *  添加测试数据
+     *
+     * @return 耗时
+     */
     @RequestMapping(value = "/insertTestValue", method = RequestMethod.GET)
     public String insertTestValue() {
-        mySQLService.insertTestValue();
-        return "success";
+        return "success. using time: " + mySQLService.insertTestValue();
     }
 }

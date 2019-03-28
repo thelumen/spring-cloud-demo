@@ -25,9 +25,9 @@ public class MySQLServiceImpl implements MySQLService {
     InstanceRepository instanceRepository;
 
     @Override
-    public void insertTestValue() {
-        int count = 100 * 1000;
-        long idBase = 100000000000030L;
+    public long insertTestValue() {
+        int count = 900 * 1000;
+        long idBase = 100000000100029L;
         int vmInstanceServiceType = 1001;
         String instanceStatus = "running";
         String pool1 = "pool1";
@@ -36,14 +36,16 @@ public class MySQLServiceImpl implements MySQLService {
         String az2 = "az2";
         List<Instances> instancesList = new ArrayList<>(count);
         List<VmInstance> vmInstanceList = new ArrayList<>(count);
+        int endCount = 1000 * 1000;
+        Date dateEnd = DateUtil.getDateFromNow(Calendar.MINUTE, -endCount);
 
         for (int i = 1; i < count; i++) {
-            Date date = DateUtil.getDateFromNow(Calendar.MINUTE, -i);
+            Date date = DateUtil.getDateFrom(dateEnd, Calendar.MINUTE, -i);
             Instances instances = new Instances()
                     .setInstanceId(idBase + i).setCreateDate(date)
                     .setServiceType(vmInstanceServiceType)
                     .setInstanceStatus(instanceStatus);
-            if (i % 5 == 0) {
+            if (i % 2 == 0) {
                 instances.setPool(pool2);
             } else {
                 instances.setPool(pool1);
@@ -57,12 +59,13 @@ public class MySQLServiceImpl implements MySQLService {
             VmInstance vmInstance = new VmInstance()
                     .setInstanceId(idBase + i)
                     .setCpu(Random.getRandom(1, 10))
-                    .setMemory(Random.getRandom(1, 16));
+                    .setMemory(Random.getRandom(8, 16));
             vmInstanceList.add(vmInstance);
         }
-
+        Date startDate = new Date();
         instanceRepository.save(instancesList);
         vmInstanceRepository.save(vmInstanceList);
+        return (new Date().getTime() - startDate.getTime()) / 1000 / 60;
     }
 
 
