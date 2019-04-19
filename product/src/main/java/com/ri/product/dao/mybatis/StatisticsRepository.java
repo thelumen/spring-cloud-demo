@@ -1,4 +1,4 @@
-package com.ri.product.dao;
+package com.ri.product.dao.mybatis;
 
 import com.ri.product.bo.StatisticsBO;
 import com.ri.product.pojo.Statistics;

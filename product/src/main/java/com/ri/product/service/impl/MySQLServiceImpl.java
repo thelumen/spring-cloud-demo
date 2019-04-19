@@ -1,9 +1,9 @@
 package com.ri.product.service.impl;
 
 import com.ri.product.bo.StatisticsBO;
-import com.ri.product.dao.InstanceRepository;
-import com.ri.product.dao.StatisticsRepository;
-import com.ri.product.dao.VmInstanceRepository;
+import com.ri.product.dao.mybatis.InstanceRepository;
+import com.ri.product.dao.mybatis.StatisticsRepository;
+import com.ri.product.dao.mybatis.VmInstanceRepository;
 import com.ri.product.pojo.*;
 import com.ri.product.service.MySQLService;
 import com.ri.product.util.DateUtil;

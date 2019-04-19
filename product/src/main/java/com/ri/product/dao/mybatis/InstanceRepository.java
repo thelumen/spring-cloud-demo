@@ -1,4 +1,4 @@
-package com.ri.product.dao;
+package com.ri.product.dao.mybatis;
 
 import com.ri.product.pojo.Instances;
 import org.springframework.data.mybatis.repository.support.MybatisRepository;
