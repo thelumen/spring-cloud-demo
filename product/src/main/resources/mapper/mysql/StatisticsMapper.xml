@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ri.product.pojo.Statistics">
+
+    <select id="queryByStatementName" resultType="com.ri.product.bo.StatisticsBO">
+        SELECT
+            s.NAME AS name,
+            s.statement_select AS statementSelect,
+            s.statement_from AS statementFrom,
+            s.statement_where AS statementWhere,
+            sf.field_inDB AS fieldInDB,
+            sf.field_name AS fieldName
+        FROM
+            console.statistics s,
+            console.statistics_field sf
+        WHERE
+            s.id = sf.statistics_id
+        <if test="statistics.name != null and statistics.name != ''">
+            AND s.name = #{statistics.name}
+        </if>
+    </select>
+
+    <select id="queryName" resultType="com.ri.product.bo.StatisticsBO">
+        SELECT
+            s. NAME AS NAME
+        FROM
+            console.statistics s
+    </select>
+</mapper>

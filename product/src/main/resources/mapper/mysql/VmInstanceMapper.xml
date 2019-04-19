@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ri.product.pojo.VmInstance">
+
+    <select id="queryByStatement" resultType="java.util.HashMap">
+        <if test="statistics.statementSelect != null and statistics.statementSelect != ''
+            and statistics.statementFrom != null and statistics.statementFrom != ''
+            and statistics.statementWhere != null and statistics.statementWhere != ''">
+            select
+            ${statistics.statementSelect}
+            <if test="selectList != null and selectList.size != 0">
+                <foreach collection="selectList" item="sta" separator="," open=", ">
+                    <if test="sta != null and sta != ''">
+                        ${sta}
+                    </if>
+                </foreach>
+            </if>
+            FROM ${statistics.statementFrom}
+            WHERE ${statistics.statementWhere}
+            <if test="whereList != null and whereList.size != 0">
+                <foreach collection="whereList" item="sta">
+                    <if test="sta != null and sta != ''">
+                        ${sta}
+                    </if>
+                </foreach>
+            </if>
+            <if test="groupList != null and groupList.size != 0">
+                GROUP BY
+                <foreach collection="groupList" item="sta" separator=",">
+                    <if test="sta != null and sta != ''">
+                        ${sta}
+                    </if>
+                </foreach>
+            </if>
+        </if>
+    </select>
+
+</mapper>

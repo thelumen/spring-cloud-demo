@@ -17,6 +17,17 @@ public class DashboardBo {
 
     private Integer margin;
 
+    private Long[] orderArray;
+
+    public Long[] getOrderArray() {
+        return orderArray;
+    }
+
+    public DashboardBo setOrderArray(Long[] orderArray) {
+        this.orderArray = orderArray;
+        return this;
+    }
+
     public String getAvailableZone() {
         return availableZone;
     }

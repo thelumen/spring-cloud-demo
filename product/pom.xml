@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>1.5.9.RELEASE</version>
+        <version>1.5.10.RELEASE</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.ri</groupId>
@@ -18,15 +18,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.8</java.version>
         <skipTests>true</skipTests>
-        <spring.boot.version>1.5.9.RELEASE</spring.boot.version>
-        <spring.cloud.version>Edgware.RELEASE</spring.cloud.version>
-        <classmate.version>1.3.1</classmate.version>
-        <groovy.version>2.4.7</groovy.version>
-
-        <spring-rabbit.version>1.7.4.RELEASE</spring-rabbit.version>
-        <spring-amqp.version>1.7.4.RELEASE</spring-amqp.version>
-        <curator-framework.version>2.12.0</curator-framework.version>
-        <curator-recipes.version>2.12.0</curator-recipes.version>
     </properties>
 
     <dependencies>
@@ -48,10 +39,10 @@
         </dependency>
 
         <!-- mongodb -->
-        <!--<dependency>-->
-            <!--<groupId>org.springframework.boot</groupId>-->
-            <!--<artifactId>spring-boot-starter-data-mongodb</artifactId>-->
-        <!--</dependency>-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-mongodb</artifactId>
+        </dependency>
 
         <!-- eureka -->
         <dependency>
@@ -61,17 +52,17 @@
         </dependency>
 
         <!-- fegin -->
-        <!--<dependency>-->
-            <!--<groupId>org.springframework.cloud</groupId>-->
-            <!--<artifactId>spring-cloud-starter-feign</artifactId>-->
-            <!--<version>1.4.6.RELEASE</version>-->
-        <!--</dependency>-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-feign</artifactId>
+            <version>1.4.6.RELEASE</version>
+        </dependency>
 
-        <!--<dependency>-->
-            <!--<groupId>com.netflix.archaius</groupId>-->
-            <!--<artifactId>archaius-core</artifactId>-->
-            <!--<version>0.7.6</version>-->
-        <!--</dependency>-->
+        <dependency>
+            <groupId>com.netflix.archaius</groupId>
+            <artifactId>archaius-core</artifactId>
+            <version>0.7.6</version>
+        </dependency>
 
         <!-- mysql start -->
         <dependency>
@@ -85,7 +76,6 @@
             <artifactId>druid-spring-boot-starter</artifactId>
             <version>1.1.2</version>
         </dependency>
-
         <dependency>
             <groupId>com.ifrabbit</groupId>
             <artifactId>spring-data-mybatis</artifactId>
@@ -98,25 +88,25 @@
             <version>1.5.9.RELEASE</version>
         </dependency>
         <!-- mysql end -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>1.2.28</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-dependencies</artifactId>
-                <version>${spring.cloud.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <build>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals><goal>repackage</goal></goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

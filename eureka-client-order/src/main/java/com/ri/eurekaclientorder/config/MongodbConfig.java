@@ -60,7 +60,7 @@ public class MongodbConfig extends AbstractMongoConfiguration {
     }
 
     @Bean
-    public MongoTemplate mongoTemplate() throws Exception {
+    public MongoTemplate mongoTemplate() {
         return new MongoTemplate(this.dbFactory(), this.mappingMongoConverter());
     }
 }

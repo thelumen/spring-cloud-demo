@@ -32,6 +32,17 @@ public class DashboardSet implements Serializable {
 
     private Date updateTime;
 
+    private Long[] orderArray;
+
+    public Long[] getOrderArray() {
+        return orderArray;
+    }
+
+    public DashboardSet setOrderArray(Long[] orderArray) {
+        this.orderArray = orderArray;
+        return this;
+    }
+
     public String getId() {
         return id;
     }

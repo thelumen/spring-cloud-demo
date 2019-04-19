@@ -8,4 +8,6 @@ import java.util.Map;
 public interface MongoDBService {
 
     Map<String, Object> queryByDashboardSet(DashboardSet dashboardSet);
+
+    Map<String, Object> queryOrderDetailByDashboardSet(DashboardSet dashboardSet);
 }

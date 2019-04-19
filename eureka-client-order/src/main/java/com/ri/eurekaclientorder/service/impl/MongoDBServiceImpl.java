@@ -3,12 +3,14 @@ package com.ri.eurekaclientorder.service.impl;
 import com.ri.eurekaclientorder.bo.DashboardBo;
 import com.ri.eurekaclientorder.dao.TestRepository;
 import com.ri.eurekaclientorder.pojo.DashboardSet;
+import com.ri.eurekaclientorder.pojo.OrderDetail;
 import com.ri.eurekaclientorder.service.MongoDBService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -23,14 +25,28 @@ public class MongoDBServiceImpl implements MongoDBService {
     MongoTemplate mongoTemplate;
 
     @Override
+    public Map<String, Object> queryOrderDetailByDashboardSet(DashboardSet dashboardSet) {
+        Query query = new Query(Criteria.where("orderId").in(dashboardSet.getOrderArray()));
+        return validatorResponse(dashboardSet, mongoTemplate.find(query, OrderDetail.class));
+    }
+
+    @Override
     public Map<String, Object> queryByDashboardSet(DashboardSet dashboardSet) {
+        String collectionName = "order";
+
         String createTime = "createTime";
         String payment = "payableAmount";
+        String orderId = "orderId";
         String time = "time";
+
+        String paymentMapping = "total";
+        String countMapping = "used";
+        String orderArrayMapping = "orderArray";
+
         // 验证查询对象
         validatorDashboardSetForMongoDB(dashboardSet);
         // 筛选结果集
-        Criteria criteria = new Criteria("createTime").gte(dashboardSet.getStartTime()).lte(dashboardSet.getEndTime());
+        Criteria criteria = new Criteria(createTime).gte(dashboardSet.getStartTime()).lte(dashboardSet.getEndTime());
         // 筛选资源池和可用域
 //        if (dashboardSet.getResourcepool() != null && !dashboardSet.getResourcepool().equals("")) {
 //            criteria = criteria.and("resourcePool").is(dashboardSet.getResourcepool());
@@ -48,21 +64,22 @@ public class MongoDBServiceImpl implements MongoDBService {
 //        ProjectionOperation timeProject = Aggregation.project(payment)
 //                .and(StringOperators.Substr.valueOf(createTime).substring(0, Integer.valueOf(dashboardSet.getTimeDivision()))).as(time);
         // 修改结果集时间字段 方法2
-        ProjectionOperation timeProject2 = Aggregation.project(payment)
+        ProjectionOperation timeProject = Aggregation.project(payment, orderId)
                 .and(DateOperators.DateToString.dateOf(createTime).toString(dashboardSet.getTimeDivision())).as(time);
         // 对结果集分组统计
         GroupOperation group = Aggregation.group(time)
-                .sum(payment).as("total")
-                .count().as("used");
+                .sum(payment).as(paymentMapping)
+                .count().as(countMapping)
+                .push(orderId).as(orderArrayMapping);
         // 注意 group key time 会映射成 _id，所以要利用 project 阶段映射回 time
-        ProjectionOperation project = Aggregation.project("total", "used")
+        ProjectionOperation project = Aggregation.project(paymentMapping, countMapping, orderArrayMapping)
                 .and("_id").as(time).andExclude("_id");
         // 按时间排序
         SortOperation sortOperation = Aggregation.sort(Sort.Direction.ASC, time);
         // 组装管道
-        Aggregation aggregation = Aggregation.newAggregation(match, timeProject2, group, project, sortOperation);
-        System.out.println(aggregation.toString());
-        AggregationResults<DashboardBo> results = mongoTemplate.aggregate(aggregation, "order", DashboardBo.class);
+        Aggregation aggregation = Aggregation.newAggregation(match, timeProject, group, project, sortOperation);
+//        System.out.println(aggregation.toString());
+        AggregationResults<DashboardBo> results = mongoTemplate.aggregate(aggregation, collectionName, DashboardBo.class);
         return validatorResponse(dashboardSet, results.getMappedResults());
     }
 
@@ -99,7 +116,7 @@ public class MongoDBServiceImpl implements MongoDBService {
         return (int) ((date2.getTime() - date1.getTime()) / (1000 * 3600 * 24));
     }
 
-    private Map<String, Object> validatorResponse(DashboardSet dashboardSet, List<DashboardBo> dashboardBoList) {
+    private Map<String, Object> validatorResponse(DashboardSet dashboardSet, List dashboardBoList) {
         return new HashMap<String, Object>() {{
             put("dashboardSet", dashboardSet);
             put("dashboardBoList", dashboardBoList);

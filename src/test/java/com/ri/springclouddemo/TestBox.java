@@ -6,22 +6,16 @@ import org.junit.Test;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class TestBox {
 
     @Test
     public void t7() {
-        User user = new User().setPool("pool");
-        testUser(user);
-        System.out.println(user);
-    }
-
-    private void testUser(User user) {
-        user.setName(user.getPool());
+        Set<String> strings = new HashSet<>();
+        strings.add("a");
+        strings.add("b");
+        System.out.println(strings.contains("a"));
     }
 
     @Test

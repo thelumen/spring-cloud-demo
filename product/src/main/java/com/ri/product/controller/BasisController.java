@@ -1,11 +1,12 @@
 package com.ri.product.controller;
 
+import com.alibaba.fastjson.JSONObject;
+import com.ri.product.pojo.DashboardStatement;
 import com.ri.product.service.MySQLService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/basis")
@@ -27,5 +28,16 @@ public class BasisController {
     @RequestMapping(value = "/insertTestValue", method = RequestMethod.GET)
     public String insertTestValue() {
         return "success. using time: " + mySQLService.insertTestValue();
+    }
+
+    @RequestMapping(value = "testInsertStatement", method = RequestMethod.POST)
+    public Map<String, Object> testInsertStatement(@RequestBody DashboardStatement dashboardStatement) {
+        return mySQLService.testInsertStatement(dashboardStatement);
+    }
+
+    @RequestMapping(value = "testInsertStatementWithJson", method = RequestMethod.POST)
+    public Map<String, Object> testInsertStatementWithJson(@RequestBody String jsonStr) {
+        DashboardStatement dashboardStatement = JSONObject.parseObject(jsonStr, DashboardStatement.class);
+        return mySQLService.testInsertStatement(dashboardStatement);
     }
 }

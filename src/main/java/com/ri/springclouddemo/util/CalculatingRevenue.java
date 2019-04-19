@@ -26,7 +26,7 @@ public class CalculatingRevenue {
         String t2 = "[0-9\\.]{1,32}";
         String t3 = "[a-zA-Z0-9\\u4E00-\\u9FA5_\\.\\-]{1,32}";
         String t4 = "[0-9]{1,32}";
-        String t5 = "1.";
+        String t5 = "testName";
         calculateIncome(t3,t5);
         ArrayList<Object> arrayList = new ArrayList<>();
     }

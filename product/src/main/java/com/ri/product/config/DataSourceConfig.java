@@ -11,7 +11,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import javax.sql.DataSource;
 
 @Configuration
-@EnableMybatisRepositories(value = "com.ri.product.dao", mapperLocations = "classpath*:/mapper/*.xml")
+@EnableMybatisRepositories(value = "com.ri.product.dao", mapperLocations = "classpath*:/mapper/mysql/*.xml")
 public class DataSourceConfig {
 
     @Bean
