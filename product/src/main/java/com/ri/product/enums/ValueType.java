@@ -1,16 +1,16 @@
 package com.ri.product.enums;
 
 public enum ValueType {
-    VALUE_TYPE_INT("int", ""),
-    VALUE_TYPE_STRING("string", ""),
-    VALUE_TYPE_STRINGLIST("stringList", ""),
-    VALUE_TYPE_INTLIST("intList", ""),
+    VALUE_TYPE_INT("int", "[0-9\\.]{1,32}"),
+    VALUE_TYPE_STRING("string", "[a-zA-Z0-9\\u4E00-\\u9FA5_\\.\\-%*@]{1,32}"),
+    VALUE_TYPE_STRINGLIST("stringList", "[a-zA-Z0-9\\u4E00-\\u9FA5_\\.\\-,]{1,32}"),
+    VALUE_TYPE_INTLIST("intList", "[0-9\\.,]{1,32}"),
     VALUE_TYPE_FUNCTION("function", ""),
-    VALUE_TYPE_BEWTEEN_INT("betweenInt", ""),
-    VALUE_TYPE_BETWEEN_STRING("betweenString", ""),
+    VALUE_TYPE_BEWTEEN_INT("betweenInt", "[0-9\\.,]{1,32}"),
+    VALUE_TYPE_BETWEEN_STRING("betweenString", "[a-zA-Z0-9\\u4E00-\\u9FA5_\\.\\-,]{1,32}"),
     VALUE_TYPE_BETWEEN_FUNCTION("betweenFunction", ""),
     VALUE_TYPE_FIELD("field", ""),
-    VALUE_TYPE_CONSTANT("constant", ""),
+    VALUE_TYPE_CONSTANT("constant", "[a-zA-Z0-9\\u4E00-\\u9FA5_\\.\\-\\s]{1,32}"),
     ;
 
     String type;

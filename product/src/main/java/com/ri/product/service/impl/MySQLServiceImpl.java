@@ -1,6 +1,7 @@
 package com.ri.product.service.impl;
 
 import com.ri.product.bo.StatisticsBO;
+import com.ri.product.dao.mongo.DashboardStatementRepository;
 import com.ri.product.dao.mybatis.InstanceRepository;
 import com.ri.product.dao.mybatis.StatisticsRepository;
 import com.ri.product.dao.mybatis.VmInstanceRepository;
@@ -9,11 +10,16 @@ import com.ri.product.service.MySQLService;
 import com.ri.product.util.DateUtil;
 import com.ri.product.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+import static com.ri.product.constant.Constant.*;
 import static com.ri.product.enums.ValueType.*;
+import static com.ri.product.util.MatcherUtil.match;
 
 @Service
 public class MySQLServiceImpl implements MySQLService {
@@ -27,75 +33,87 @@ public class MySQLServiceImpl implements MySQLService {
     @Autowired
     StatisticsRepository statisticsRepository;
 
-    // 指令类型
-    private static final String ORDER_SELECT = "select";
-    private static final String ORDER_WHERE = "where";
-    private static final String ORDER_GROUP = "group";
+    @Autowired
+    DashboardStatementRepository dashboardStatementRepository;
 
-    // 连接词类型
-    private static final Map<String, String> LINK = new HashMap<String, String>() {{
-        put("AND", "AND");
-        put("and", "AND");
-        put("OR", "OR");
-        put("or", "OR");
+    @Autowired
+    MongoTemplate mongoTemplate;
 
-    }};
-    // 操作类型
-    private static final Map<String, String> OPERATE = new HashMap<String, String>() {{
-        put("lt", "<");
-        put("gt", ">");
-        put("ge", ">=");
-        put("le", "<=");
-        put("ltgt", "!=");
-        put("=", "=");
-        put("IN", "IN");
-        put("in", "IN");
-        put("is null", "IS NULL");
-        put("IS NULL", "IS NULL");
-        put("IS NOT NULL", "IS NOT NULL");
-        put("is not null", "IS NOT NULL");
-        put("between", "BETWEEN");
-        put("BETWEEN", "BETWEEN");
-    }};
+    public Map<String, Object> saveDashboardStatement(DashboardStatement dashboardStatement) {
+        return new HashMap<String, Object>() {{
+            put("result", dashboardStatementRepository.save(dashboardStatement));
+        }};
+    }
 
-    // 方法类型
-    private static final Set<String> FUNCATION = new HashSet<String>() {{
+    public Map<String, Object> deleteDashboardStatement(DashboardStatement dashboardStatement) {
+        dashboardStatementRepository.delete(dashboardStatement);
+        return new HashMap<String, Object>() {{
+            put("result", "maybe success");
+        }};
+    }
 
-    }};
+    public Map<String, Object> queryDashboardStatement(DashboardStatement dashboardStatement) {
+        String userId = null;
+        if (dashboardStatement.getUserId() != null && !dashboardStatement.getUserId().equals("")) {
+            userId = dashboardStatement.getUserId();
+        }
+        Query query = new Query();
+        if (userId != null && !userId.equals(""))
+            query.addCriteria(Criteria.where("userId").is(userId));
+        List<DashboardStatement> dashboardStatements = mongoTemplate.find(query, DashboardStatement.class);
+        return new HashMap<String, Object>() {{
+            put("result", dashboardStatements);
+        }};
+    }
+
+    public Map<String, Object> getDashboardStatementByUserId(DashboardStatement dashboardStatement) {
+        String userId = null;
+        if (dashboardStatement.getUserId() != null && !dashboardStatement.getUserId().equals("")) {
+            userId = dashboardStatement.getUserId();
+        }
+        Query query = new Query();
+        if (userId != null && !userId.equals("")) {
+            query.addCriteria(Criteria.where("userId").is(userId));
+        } else {
+            return new HashMap<String, Object>() {{
+                put("error", "miss userId ");
+            }};
+        }
+        List<DashboardStatement> dashboardStatements = mongoTemplate.find(query, DashboardStatement.class);
+        List<Map<String, Object>> resultList = new ArrayList<>();
+        Map<String, Object> map;
+        for (DashboardStatement dashboardStatement1 : dashboardStatements) {
+            map = testInsertStatement(dashboardStatement1);
+            if (map.containsKey("error")) {
+                return map;
+            }
+            resultList.add(map);
+        }
+        return new HashMap<String, Object>() {{
+            put("result", resultList);
+        }};
+    }
 
     @Override
     public Map<String, Object> testInsertStatement(DashboardStatement dashboardStatement) {
-        if (dashboardStatement.getStatisticsName() == null || dashboardStatement.getStatisticsName().equals("")) {
-            return packResult(new ArrayList<String>() {{
-                add("error msg");
-            }}, "缺少统计名");
-        }
+        if (dashboardStatement.getStatisticsName() == null || dashboardStatement.getStatisticsName().equals(""))
+            return errorMap("缺少统计名");
+        // 根据统计名获取查询的基本组成信息
         List<StatisticsBO> statisticsBOList = statisticsRepository.queryByStatementName(new Statistics().setName(dashboardStatement.getStatisticsName()));
-        if (statisticsBOList == null || statisticsBOList.size() == 0) {
-            return packResult(new ArrayList<String>() {{
-                add("error msg");
-            }}, "缺少统计信息");
-        }
+        if (statisticsBOList == null || statisticsBOList.size() == 0)
+            return errorMap("缺少统计信息");
         StatisticsBO statisticsBO = statisticsBOList.get(0);
-        if (statisticsBO.getStatementFrom() == null || statisticsBO.getStatementFrom().equals("")) {
-            return packResult(new ArrayList<String>() {{
-                add("error msg");
-            }}, "统计信息 From 存在错误");
-        }
-        if (statisticsBO.getStatementSelect() == null || statisticsBO.getStatementSelect().equals("")) {
-            return packResult(new ArrayList<String>() {{
-                add("error msg");
-            }}, "统计信息 Select 存在错误");
-        }
-        if (statisticsBO.getStatementWhere() == null || statisticsBO.getStatementWhere().equals("")) {
-            return packResult(new ArrayList<String>() {{
-                add("error msg");
-            }}, "统计信息 Where 存在错误");
-        }
+        if (statisticsBO.getStatementFrom() == null || statisticsBO.getStatementFrom().equals(""))
+            return errorMap("统计信息 From 存在错误");
+        if (statisticsBO.getStatementSelect() == null || statisticsBO.getStatementSelect().equals(""))
+            return errorMap("统计信息 Select 存在错误");
+        if (statisticsBO.getStatementWhere() == null || statisticsBO.getStatementWhere().equals(""))
+            return errorMap("统计信息 Where 存在错误");
         Statistics statistics = new Statistics()
                 .setStatementFrom(statisticsBO.getStatementFrom())
                 .setStatementSelect(statisticsBO.getStatementSelect())
                 .setStatementWhere(statisticsBO.getStatementWhere());
+        // 制作字段过滤集合
         Set<String> fieldSet = new HashSet<>();
         statisticsBOList.forEach(statisticsBO1 -> fieldSet.add(statisticsBO1.getFieldInDB()));
         List<String> selectList = new ArrayList<>();
@@ -104,20 +122,16 @@ public class MySQLServiceImpl implements MySQLService {
         Map<String, Object> completeStatement;
         Map<String, Object> mapping = new HashMap<>();
         List<String> index = new ArrayList<>();
+        List<String> indexY = new ArrayList<>();
         for (Statement statement : dashboardStatement.getStatements()) {
             if (statement.getOrder() == null) {
-                return packResult(new ArrayList<String>() {{
-                    add("error msg");
-                }}, "error order in statement");
+                return errorMap("error order in statement");
             }
             switch (statement.getOrder()) {
                 case ORDER_SELECT:
                     completeStatement = selectHandle(statement, fieldSet);
-                    if (completeStatement.containsKey("error")) {
-                        return packResult(new ArrayList<String>() {{
-                            add("msg");
-                        }}, completeStatement.get("error"));
-                    }
+                    if (completeStatement.containsKey("error"))
+                        return errorMap(completeStatement.get("error"));
                     // 添加到SQL结果映射
                     selectList.add(String.valueOf(completeStatement.get("completeStatement")));
                     // 添加到展示结果映射
@@ -127,24 +141,18 @@ public class MySQLServiceImpl implements MySQLService {
                     break;
                 case ORDER_WHERE:
                     completeStatement = whereHandle(statement, false, fieldSet);
-                    if (completeStatement.containsKey("error")) {
-                        return packResult(new ArrayList<String>() {{
-                            add("error msg");
-                        }}, completeStatement.get("error"));
-                    }
+                    if (completeStatement.containsKey("error"))
+                        return errorMap(completeStatement.get("error"));
                     whereList.add(String.valueOf(completeStatement.get("completeStatement")));
                     break;
                 case ORDER_GROUP:
                     completeStatement = groupHandle(statement, fieldSet);
-                    if (completeStatement.containsKey("error")) {
-                        return packResult(new ArrayList<String>() {{
-                            add("error msg");
-                        }}, completeStatement.get("error"));
-                    }
+                    if (completeStatement.containsKey("error"))
+                        return errorMap(completeStatement.get("error"));
                     // 添加到展示结果映射
                     mapping.putAll((Map<String, Object>) completeStatement.get("mapping"));
                     // 添加展示结果目录
-                    index.addAll((ArrayList<String>) completeStatement.get("index"));
+                    indexY.addAll((ArrayList<String>) completeStatement.get("index"));
                     // 添加到分组
                     groupList.add(String.valueOf(completeStatement.get("completeStatementForGroup")));
                     // 添加到SQL结果映射
@@ -153,28 +161,33 @@ public class MySQLServiceImpl implements MySQLService {
             }
         }
         List<HashMap<String, Object>> vmInstanceMapList = vmInstanceRepository.queryByStatement(selectList, whereList, groupList, statistics);
-        return packResult(new ArrayList<String>() {{
-            add("list");
-            add("mapping");
-            add("index");
-        }}, vmInstanceMapList, mapping, index);
+        return new HashMap<String, Object>() {{
+            put("list", vmInstanceMapList);
+            put("mapping", mapping);
+            put("indexY", indexY);
+            put("index", index);
+        }};
     }
 
+    /**
+     * select 处理器
+     *
+     * @param statement 语句对象
+     * @param fieldSet  字段过滤集合
+     * @return 封装结果 error：错误信息 completeStatement：已完成的语句 index：映射目录 mapping：映射集
+     */
     private Map<String, Object> selectHandle(Statement statement, Set<String> fieldSet) {
         StringBuilder stringBuilder = new StringBuilder();
         if ((statement.getField() == null && statement.getFunctionList() == null) || (statement.getField().equals("") && statement.getFunctionList().size() == 0)) {
-            return new HashMap<String, Object>() {{
-                put("error", "error field in select");
-            }};
+            return errorMap("error field in select");
         }
         Map<String, String> mapping = new HashMap<>();
         List<String> index = new ArrayList<>();
-        if (VALUE_TYPE_STRING.getType().equals(statement.getValueType())) {
-            if (!fieldSet.contains(statement.getField())) {
-                return new HashMap<String, Object>() {{
-                    put("error", "field illegal in select");
-                }};
-            }
+        if (VALUE_TYPE_FIELD.getType().equals(statement.getValueType())) {
+            if (!fieldSet.contains(statement.getField()))
+                return errorMap("field illegal in select");
+//            if (!match(VALUE_TYPE_STRING.getRegEx(), statement.getValue()))
+//                return errorMap("value illegal in select");
             stringBuilder.append(statement.getField());
             if (statement.getValue() != null && !statement.getValue().equals("")) {
                 mapping.put(statement.getField(), statement.getValue());
@@ -197,9 +210,7 @@ public class MySQLServiceImpl implements MySQLService {
             }
             index.add(alias);
         } else {
-            return new HashMap<String, Object>() {{
-                put("error", "error value type in select order");
-            }};
+            return errorMap("error value type in select order");
         }
         return new HashMap<String, Object>() {{
             put("completeStatement", stringBuilder.toString());
@@ -213,6 +224,7 @@ public class MySQLServiceImpl implements MySQLService {
      *
      * @param statement      语句对象
      * @param firstStatement 是否是首句？是，不处理连接词：不是，处理连接词
+     * @param fieldSet       字段过滤集合
      * @return 封装结果 error：错误信息 completeStatement：已完成的语句
      */
     private Map<String, Object> whereHandle(Statement statement, boolean firstStatement, Set<String> fieldSet) {
@@ -220,11 +232,8 @@ public class MySQLServiceImpl implements MySQLService {
         // 判断是否是首句
         if (!firstStatement) {
             // 否，拼接连接词
-            if (!LINK.containsKey(statement.getLink())) {
-                return new HashMap<String, Object>() {{
-                    put("error", "error link in where");
-                }};
-            }
+            if (!LINK.containsKey(statement.getLink()))
+                return errorMap("error link in where");
             stringBuilder.append(LINK.get(statement.getLink())).append(" ");
         }
         // 判断连接词之后是否有子句
@@ -236,9 +245,8 @@ public class MySQLServiceImpl implements MySQLService {
             for (Statement clause : statement.getStatementList()) {
                 // 回调获取完整句子
                 Map<String, Object> clauseMap = whereHandle(clause, firstClause, fieldSet);
-                if (clauseMap.containsKey("error")) {
+                if (clauseMap.containsKey("error"))
                     return clauseMap;
-                }
                 stringBuilder.append(clauseMap.get("completeStatement"));
                 firstClause = false;
             }
@@ -249,11 +257,8 @@ public class MySQLServiceImpl implements MySQLService {
             }};
         }
         // 拼接字段
-        if (!fieldSet.contains(statement.getField())) {
-            return new HashMap<String, Object>() {{
-                put("error", "field illegal in where");
-            }};
-        }
+        if (!fieldSet.contains(statement.getField()))
+            return errorMap("field illegal in where");
         stringBuilder.append(statement.getField()).append(" ");
 
         // 拼接操作符
@@ -261,19 +266,25 @@ public class MySQLServiceImpl implements MySQLService {
             if (OPERATE.containsKey(statement.getOperate())) {
                 stringBuilder.append(OPERATE.get(statement.getOperate())).append(" ");
             } else {
-                return new HashMap<String, Object>() {{
-                    put("error", "error operate");
-                }};
+                return errorMap("error operate");
             }
         }
         // 拼接数据
         if (VALUE_TYPE_INT.getType().equals(statement.getValueType())) {
+            if (!match(VALUE_TYPE_INT.getRegEx(), statement.getValue()))
+                return errorMap("value illegal in where");
             stringBuilder.append(statement.getValue()).append(" ");
         } else if (VALUE_TYPE_STRING.getType().equals(statement.getValueType())) {
+            if (!match(VALUE_TYPE_STRING.getRegEx(), statement.getValue()))
+                return errorMap("value illegal in where");
             stringBuilder.append("'").append(statement.getValue()).append("' ");
         } else if (VALUE_TYPE_INTLIST.getType().equals(statement.getValueType())) {
+            if (!match(VALUE_TYPE_INTLIST.getRegEx(), statement.getValue()))
+                return errorMap("value illegal in where");
             stringBuilder.append("(").append(statement.getValue()).append(") ");
         } else if (VALUE_TYPE_STRINGLIST.getType().equals(statement.getValueType())) {
+            if (!match(VALUE_TYPE_STRINGLIST.getRegEx(), statement.getValue()))
+                return errorMap("value illegal in where");
             stringBuilder.append("(");
             String[] valueArray = statement.getValue().split(",");
             for (String s : valueArray) {
@@ -282,32 +293,31 @@ public class MySQLServiceImpl implements MySQLService {
             stringBuilder.append(") ");
         } else if (VALUE_TYPE_FUNCTION.getType().equals(statement.getValueType())) {
             Map<String, Object> map = functionHandle(statement.getFunctionList().get(0), fieldSet);
-            if (map.containsKey("error")) {
+            if (map.containsKey("error"))
                 return map;
-            }
             stringBuilder.append(map.get("completeFunction"));
         } else if (VALUE_TYPE_BEWTEEN_INT.getType().equals(statement.getValueType())) {
+            if (!match(VALUE_TYPE_BEWTEEN_INT.getRegEx(), statement.getValue()))
+                return errorMap("value illegal in where");
             String[] valueArray = statement.getValue().split(",");
             stringBuilder.append(valueArray[0]).append(" AND ").append(valueArray[1]);
         } else if (VALUE_TYPE_BETWEEN_STRING.getType().equals(statement.getValueType())) {
+            if (!match(VALUE_TYPE_BETWEEN_STRING.getRegEx(), statement.getValue()))
+                return errorMap("value illegal in where");
             String[] valueArray = statement.getValue().split(",");
             stringBuilder.append(valueArray[0]).append("' AND '").append(valueArray[1]);
         } else if (VALUE_TYPE_BETWEEN_FUNCTION.getType().equals(statement.getValueType())) {
             Map<String, Object> map = functionHandle(statement.getFunctionList().get(0), fieldSet);
-            if (map.containsKey("error")) {
+            if (map.containsKey("error"))
                 return map;
-            }
             stringBuilder.append(map.get("completeFunction"))
                     .append(" AND ");
             map = functionHandle(statement.getFunctionList().get(1), fieldSet);
-            if (map.containsKey("error")) {
+            if (map.containsKey("error"))
                 return map;
-            }
             stringBuilder.append(map.get("completeFunction"));
         } else {
-            return new HashMap<String, Object>() {{
-                put("error", "error value type");
-            }};
+            return errorMap("error value type");
         }
         return new HashMap<String, Object>() {{
             put("completeStatement", stringBuilder.toString());
@@ -318,7 +328,8 @@ public class MySQLServiceImpl implements MySQLService {
      * 方法处理器
      *
      * @param function 方法对象
-     * @return
+     * @param fieldSet 字段过滤集合
+     * @return 封装结果 error：错误信息 completeStatement：已完成的语句
      */
     private Map<String, Object> functionHandle(Function function, Set<String> fieldSet) {
         StringBuilder stringBuilder = new StringBuilder();
@@ -327,23 +338,26 @@ public class MySQLServiceImpl implements MySQLService {
         int functionCount = 0;
         for (int i = 0; i < size; i++) {
             if (VALUE_TYPE_INT.getType().equals(function.getParameterType().get(i))) {
+                if (!match(VALUE_TYPE_INT.getRegEx(), function.getParameter().get(i - functionCount)))
+                    return errorMap("value illegal in function");
                 stringBuilder.append(function.getParameter().get(i - functionCount));
             } else if (VALUE_TYPE_STRING.getType().equals(function.getParameterType().get(i))) {
+                if (!match(VALUE_TYPE_STRING.getRegEx(), function.getParameter().get(i - functionCount)))
+                    return errorMap("value illegal in function");
                 stringBuilder.append("'").append(function.getParameter().get(i - functionCount)).append("'");
             } else if (VALUE_TYPE_CONSTANT.getType().equals(function.getParameterType().get(i))) {
+                if (!match(VALUE_TYPE_CONSTANT.getRegEx(), function.getParameter().get(i - functionCount)))
+                    return errorMap("value illegal in function");
                 stringBuilder.append(function.getParameter().get(i - functionCount));
             } else if (VALUE_TYPE_FIELD.getType().equals(function.getParameterType().get(i))) {
                 if (!fieldSet.contains(function.getParameter().get(i - functionCount))) {
-                    return new HashMap<String, Object>() {{
-                        put("error", "field illegal in function");
-                    }};
+                    return errorMap("field illegal in function");
                 }
                 stringBuilder.append(function.getParameter().get(i - functionCount));
             } else if (VALUE_TYPE_FUNCTION.getType().equals(function.getParameterType().get(i))) {
                 Map<String, Object> map = functionHandle(function.getFunctionList().get(functionCount), fieldSet);
-                if (map.containsKey("error")) {
+                if (map.containsKey("error"))
                     return map;
-                }
                 stringBuilder.append(map.get("completeFunction"));
                 functionCount++;
             }
@@ -361,7 +375,12 @@ public class MySQLServiceImpl implements MySQLService {
      * group 指令处理器
      *
      * @param statement 语句对象
-     * @return
+     * @param fieldSet  字段过滤集合
+     * @return 封装结果 error：错误信息
+     * completeStatementForGroup：用于 group 的完成语句
+     * completeStatementForSelect：用于 select 的完成语句
+     * index：映射目录
+     * mapping：映射集
      */
     private Map<String, Object> groupHandle(Statement statement, Set<String> fieldSet) {
         StringBuilder completeStatementForGroup = new StringBuilder();
@@ -369,11 +388,10 @@ public class MySQLServiceImpl implements MySQLService {
         Map<String, String> mapping = new HashMap<>();
         List<String> index = new ArrayList<>();
         if (VALUE_TYPE_FIELD.getType().equals(statement.getValueType())) {
-            if (!fieldSet.contains(statement.getField())) {
-                return new HashMap<String, Object>() {{
-                    put("error", "field illegal in group");
-                }};
-            }
+            if (!fieldSet.contains(statement.getField()))
+                return errorMap("field illegal in group");
+            if (!match(VALUE_TYPE_INT.getRegEx(), statement.getValue()))
+                return errorMap("value illegal in group");
             completeStatementForGroup.append(statement.getField());
             // 添加别名映射关系
             if (statement.getValue() != null && !statement.getValue().equals("")) {
@@ -386,16 +404,14 @@ public class MySQLServiceImpl implements MySQLService {
             completeStatementForSelect.append(statement.getField());
         } else if (VALUE_TYPE_FUNCTION.getType().equals(statement.getValueType())) {
             Map<String, Object> map = functionHandle(statement.getFunctionList().get(0), fieldSet);
-            if (map.containsKey("error")) {
+            if (map.containsKey("error"))
                 return map;
-            }
             completeStatementForGroup.append(map.get("completeFunction"));
             Function function = statement.getFunctionList().get(0);
             String alias = getAliasFromFunction(function);
             map = functionHandle(function, fieldSet);
-            if (map.containsKey("error")) {
+            if (map.containsKey("error"))
                 return map;
-            }
             completeStatementForSelect.append(map.get("completeFunction")).append(" AS ").append(alias);
             // 添加映射目录
             if (statement.getValue() != null && !statement.getValue().equals("")) {
@@ -418,26 +434,23 @@ public class MySQLServiceImpl implements MySQLService {
      * 从 function 类中获取 alias （别名）
      *
      * @param function 方法对象
-     * @return
+     * @return alias （别名）
      */
-    public String getAliasFromFunction(Function function) {
+    private String getAliasFromFunction(Function function) {
         String alias = function.getFunctionName() + "_" + function.getParameter().get(0);
         alias = alias.replace(".", "_");
         return alias;
     }
 
     /**
-     * 包装结果对象
+     * 返回含错误信息的map
      *
-     * @param key   键
-     * @param value 值
-     * @return
+     * @param msg 信息
+     * @return 含有 error key 的 map
      */
-    public static Map<String, Object> packResult(List<String> key, Object... value) {
+    private static Map<String, Object> errorMap(Object msg) {
         return new HashMap<String, Object>() {{
-            for (int i = 0; i < key.size(); i++) {
-                put(key.get(i), value[i]);
-            }
+            put("error", msg);
         }};
     }
 

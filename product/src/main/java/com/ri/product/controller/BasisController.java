@@ -40,4 +40,28 @@ public class BasisController {
         DashboardStatement dashboardStatement = JSONObject.parseObject(jsonStr, DashboardStatement.class);
         return mySQLService.testInsertStatement(dashboardStatement);
     }
+
+    @RequestMapping(value = "saveDashboardStatement", method = RequestMethod.POST)
+    public Map<String, Object> saveDashboardStatement(@RequestBody String jsonStr) {
+        DashboardStatement dashboardStatement = JSONObject.parseObject(jsonStr, DashboardStatement.class);
+        return mySQLService.saveDashboardStatement(dashboardStatement);
+    }
+
+    @RequestMapping(value = "queryDashboardStatement", method = RequestMethod.POST)
+    public Map<String, Object> queryDashboardStatement(@RequestBody String jsonStr) {
+        DashboardStatement dashboardStatement = JSONObject.parseObject(jsonStr, DashboardStatement.class);
+        return mySQLService.queryDashboardStatement(dashboardStatement);
+    }
+
+    @RequestMapping(value = "getDashboardStatementByUserId", method = RequestMethod.POST)
+    public Map<String, Object> getDashboardStatementByUserId(@RequestBody String jsonStr) {
+        DashboardStatement dashboardStatement = JSONObject.parseObject(jsonStr, DashboardStatement.class);
+        return mySQLService.getDashboardStatementByUserId(dashboardStatement);
+    }
+
+    @RequestMapping(value = "deleteDashboardStatement", method = RequestMethod.POST)
+    public Map<String, Object> deleteDashboardStatement(@RequestBody String jsonStr) {
+        DashboardStatement dashboardStatement = JSONObject.parseObject(jsonStr, DashboardStatement.class);
+        return mySQLService.deleteDashboardStatement(dashboardStatement);
+    }
 }

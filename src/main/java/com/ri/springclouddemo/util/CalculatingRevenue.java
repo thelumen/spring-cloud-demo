@@ -14,19 +14,19 @@ public class CalculatingRevenue {
         System.out.println(regEx);
         Pattern pattern = Pattern.compile(regEx);
         Matcher matcher = pattern.matcher(value);
-        if(!matcher.matches()){
-            System.out.println("参数 "+ value +" 的值不合法！");
-        }else {
+        if (matcher.matches()) {
             System.out.println("参数 "+ value +" 的值合法！");
+        } else {
+            System.out.println("参数 "+ value +" 的值不合法！");
         }
     }
 
     public static void main(String[] args) {
         String t1 = "[0-9]{1,16}";
         String t2 = "[0-9\\.]{1,32}";
-        String t3 = "[a-zA-Z0-9\\u4E00-\\u9FA5_\\.\\-]{1,32}";
+        String t3 = "[a-zA-Z0-9\\u4E00-\\u9FA5_\\.\\-%@*]{1,32}";
         String t4 = "[0-9]{1,32}";
-        String t5 = "testName";
+        String t5 = "testName@";
         calculateIncome(t3,t5);
         ArrayList<Object> arrayList = new ArrayList<>();
     }

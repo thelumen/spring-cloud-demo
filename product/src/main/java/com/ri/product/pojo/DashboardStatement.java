@@ -1,12 +1,12 @@
 package com.ri.product.pojo;
 
 
-//import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Arrays;
 import java.util.List;
 
-//@Document(collection="dashboard_statement")
+@Document(collection="dashboard_statement")
 public class DashboardStatement {
 
     //唯一id
