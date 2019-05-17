@@ -5,10 +5,10 @@ spring:
     config:
       server:
         git:
-          uri: https://github.com/thelumen/spring-test-spring-config.git  # Ô¶³Ìgit²Ö¿âµÄµØÖ·
-          username: jrj0279@163.com  # ÒÔ¼°ÏàÓ¦µÄÕË»§Ãû
-          password: Shift521  # ºÍÃÜÂë
-          #  basedir: E:\Java_IDEA\config\basedir ¿ÉÒÔÊ¹ÓÃÕâ¸öÅäÖÃÏîÀ´Ö¸¶¨±¾µØgit²Ö¿âµÄÂ·¾¶
+          uri: https://github.com/thelumen/spring-test-spring-config.git  # è¿œç¨‹gitä»“åº“çš„åœ°å€
+          username:  # ä»¥åŠç›¸åº”çš„è´¦æˆ·å
+          password:  # å’Œå¯†ç 
+          #  basedir: E:\Java_IDEA\config\basedir å¯ä»¥ä½¿ç”¨è¿™ä¸ªé…ç½®é¡¹æ¥æŒ‡å®šæœ¬åœ°gitä»“åº“çš„è·¯å¾„
 eureka:
   client:
     service-url:
