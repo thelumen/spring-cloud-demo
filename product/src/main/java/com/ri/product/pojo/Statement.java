@@ -1,6 +1,7 @@
 package com.ri.product.pojo;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 public class Statement {
@@ -8,6 +9,8 @@ public class Statement {
     private String order;
     // 数据
     private String value;
+
+    private List<Date> dates;
     // 数据类型
     private String valueType;
     // 字段
@@ -36,6 +39,15 @@ public class Statement {
 
     public Statement setValue(String value) {
         this.value = value;
+        return this;
+    }
+
+    public List<Date> getDates() {
+        return dates;
+    }
+
+    public Statement setDates(List<Date> dates) {
+        this.dates = dates;
         return this;
     }
 
@@ -98,12 +110,13 @@ public class Statement {
         return "Statement{" +
                 "order='" + order + '\'' +
                 ", value='" + value + '\'' +
+                ", dates=" + (dates != null ? Arrays.toString(dates.toArray()) : null) +
                 ", valueType='" + valueType + '\'' +
                 ", field='" + field + '\'' +
                 ", operate='" + operate + '\'' +
                 ", link='" + link + '\'' +
-                ", statementList=" + Arrays.toString(statementList.toArray()) +
-                ", functionList=" + Arrays.toString(functionList.toArray()) +
+                ", statementList=" + (statementList != null ? Arrays.toString(statementList.toArray()) : null) +
+                ", functionList=" + (functionList != null ? Arrays.toString(functionList.toArray()) : null) +
                 '}';
     }
 }

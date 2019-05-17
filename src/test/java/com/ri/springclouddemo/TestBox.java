@@ -11,6 +11,16 @@ import java.util.*;
 public class TestBox {
 
     @Test
+    public void t8() {
+        String[] test = new String[4];
+        test[0] = "a";
+        test[2] = "b";
+        test[3] = "c";
+        List<String> strings = Arrays.asList(test);
+        System.out.println(Arrays.toString(strings.toArray()));
+    }
+
+    @Test
     public void t7() {
         Set<String> strings = new HashSet<>();
         strings.add("a");

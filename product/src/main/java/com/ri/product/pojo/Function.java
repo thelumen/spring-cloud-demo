@@ -53,9 +53,9 @@ public class Function {
     public String toString() {
         return "Function{" +
                 "functionName='" + functionName + '\'' +
-                ", parameter=" + Arrays.toString(parameter.toArray()) +
-                ", parameterType=" + Arrays.toString(parameterType.toArray()) +
-                ", functionList=" + Arrays.toString(functionList.toArray()) +
+                ", parameter=" + (parameter != null ? Arrays.toString(parameter.toArray()) : null) +
+                ", parameterType=" + (parameterType != null ? Arrays.toString(parameterType.toArray()) : null) +
+                ", functionList=" + (functionList != null ? Arrays.toString(functionList.toArray()) : null) +
                 '}';
     }
 }
