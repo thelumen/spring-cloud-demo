@@ -11,6 +11,16 @@ import java.util.*;
 public class TestBox {
 
     @Test
+    public void t9() {
+        int i = 0;
+        intAdd(i);
+        System.out.println(i);
+    }
+
+    private void intAdd(int i) {
+        i++;
+    }
+    @Test
     public void t8() {
         String[] test = new String[4];
         test[0] = "a";
